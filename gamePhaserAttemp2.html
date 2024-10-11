@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
+    
+    <script>
+        let config = {
+        type:Phaser.AUTO,
+        width:800,
+        height:650,
+        physics:{
+            default:"arcade",
+            arcade:{
+                gravity:{y:500},
+                debug:true,
+            }
+        },
+        scene:{
+            preload:preload,
+            create:create,
+            update:update,
+        }
+    };
+            let isGameOver = false;
+        let score = 0;
+        let scoreText;
+        let isRefresh = false
+        let hitPlayed = false;
+        let diePlayed = false;
+        let player;
+        let base;
+        let baseImage;
+        let baseHeight;
+        let baseWidth;
+        let speed = -2
+        let spawnTime = 1500
+        let gameStart = false
+        let background;
+        let baseScroll;
+        let yunoSheet ={}
+let game = new Phaser.Game(config);
+        function preload(){
+            this.load.image('night','images/night.png')
+                this.load.atlas('yuno', 'images/spritesheet.png', 'images/spritesheet.json')
+                this.load.image("base",'images/ground.png')
+                this.load.image("pillar","images/pipe.png")
+        }
+        function create(){
+            background = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'night')
+        .setOrigin(0, 0)
+        .setScrollFactor(0);
+
+
+    baseImage = this.textures.get("base");
+    baseHeight = baseImage.getSourceImage().height;
+    baseWidth = baseImage.getSourceImage().width;
+    
+    
+
+    base = this.physics.add.staticImage(game.config.width / 2, game.config.height - baseHeight / 2, "base")
+        .setImmovable(true)
+        .setDisplaySize(game.config.width, baseHeight);
+    
+    // Create a separate tileSprite for visual scrolling
+    baseScroll = this.add.tileSprite(game.config.width / 2, game.config.height - baseHeight / 2, game.config.width, baseHeight, "base")
+        .setScrollFactor(0);
+
+
+
+    player = this.physics.add.sprite(game.config.width / 4, game.config.height / 2, 'yuno');
+    player.setScale(0.35);
+    player.setBounce(0.2);
+    player.setCollideWorldBounds(true);
+    player.setDepth(1);
+    player.body.allowGravity = false;
+
+    yunoSheet['normal'] = this.anims.create({
+        key: 'normal',
+        frames: this.anims.generateFrameNames('yuno', { prefix: 'yuno', start: 1, end: 4, zeroPad: 0, suffix: '.png' }),
+        frameRate: 3,
+        repeat: -1
+    });
+
+    yunoSheet['jump'] = this.anims.create({
+        key: 'jump',
+        frames: this.anims.generateFrameNames('yuno', { prefix: 'yuno', start: 5, end: 8, zeroPad: 0, suffix: '.png' }),
+        frameRate: 3,
+        repeat: -1
+    });
+    player.play('normal');
+
+    this.input.on("pointerdown", function (pointer) {
+        if (!gameStart) {
+            gameStart = true;
+            player.body.allowGravity = true;
+
+            scoreText = this.add.text(game.config.width / 2, 30, "0", {
+                fontSize: "32px",
+                fontFamily: "Fantasy",
+                fill: "white",
+            });
+            scoreText.setOrigin(0.5, 0.5);
+            scoreText.setDepth(1);
+        }
+
+        if (!isRefresh && !isGameOver && player.body.touching.down) {
+            console.log("Fly");
+            player.setVelocityY(-350);
+            player.play('jump');
+        }
+        isRefresh = false;
+    }, this);
+
+    this.physics.add.collider(player, base,function(){
+        if (player.body.touching.down && player.anims.currentAnim && player.anims.currentAnim.key === 'jump') {
+            player.play('normal');
+        }
+    });
+
+    this.lowerPillars = this.physics.add.group()
+    this.spawnObstacle()
+    this.physics.add.collider(player,this.lowerPillars,gameOver,null,this)
+        }
+    function update(delta){
+        if (!gameStart) return;
+
+if (!isGameOver) {
+    // Move the base visual (tileSprite)
+    baseScroll.tilePositionX +=( Math.abs(speed) * (delta / 5000))/5;
+
+    // Move the background (optional, for parallax effect)
+    background.tilePositionX += (Math.abs(speed) * 0.5 * (delta / 5000))/5;
+}
+
+// if (player.body.touching.down && player.anims.currentAnim && player.anims.currentAnim.key === 'jump') {
+//             player.play('normal');
+//         }
+// Check if player is in the air
+if (!player.body.touching.down && !player.anims.currentAnim ) {
+    player.play('jump');
+}
+if(player.body.touching.down && !player.anims.currentAnim )
+    player.play('normal')
+
+
+    let scoreIncremented = false;
+    this.lowerPillars.children.entries.forEach((obstacle) => {
+            obstacle.x += speed * (delta / 1000);
+            if(!obstacle) return;
+            if(!obstacle.hasPassed && obstacle.x+obstacle.width<player.x){
+                obstacle.hasPassed = true;
+                if(!scoreIncremented){
+                    score++;
+                    scoreText.setText(score);
+                    scoreIncremented = true;
+
+                }
+            }
+            // Remove obstacle if it's off screen
+            if (obstacle.x < -obstacle.width) {
+                obstacles.remove(obstacle, true, true);
+            }
+
+        });
+  scoreIncremented = false;
+  if(this.pillarSpawnTime<this.time.now && !isGameOver) {
+    this.spawnObstacle();
+  }
+        }
+        Phaser.Scene.prototype.spawnObstacle =function(){
+            console.log("mAZNA")
+    const obstacleHeight = this.textures.get('pillar').getSourceImage().height;
+    const minY = baseHeight;
+    const maxY = game.config.height - baseHeight - obstacleHeight;
+    const randomY = Phaser.Math.Between(minY, maxY);
+
+    const obstacle = this.lowerPillars.create(game.config.width, randomY, 'pillar');
+    obstacle.setImmovable(true);
+    obstacle.body.allowGravity = false;
+    this.pillarSpawnTime = this.time.now+spawnTime;
+}
+function gameOver() {
+    isGameOver = true;
+    player.setTint(0xff0000);
+    this.lowerPillars.setVelocityX(0);
+    this.physics.pause();
+
+    this.add.text(game.config.width / 2, game.config.height / 2, 'Game Over', { 
+        fontSize: '48px', 
+        fill: '#fff' 
+    }).setOrigin(0.5);
+
+    this.add.text(game.config.width / 2, game.config.height / 2 + 60, 'Click to Restart', { 
+        fontSize: '22px', 
+        fill: '#fff' 
+    }).setOrigin(0.5);
+
+    this.input.on('pointerdown', () => {
+        isGameOver = false;
+        this.scene.restart();
+    });
+}
+
+    </script>
+    <div class="container">
+        <div id="keys"></div>
+     </div>
+</body>
+
+</html>

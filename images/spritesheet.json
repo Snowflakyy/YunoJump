@@ -1,0 +1,175 @@
+{
+	"frames": {
+		"yuno1.png": {
+			"frame": {
+				"x": 1,
+				"y": 1,
+				"w": 584,
+				"h": 712
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 584,
+				"h": 712
+			},
+			"sourceSize": {
+				"w": 584,
+				"h": 712
+			}
+		},
+		"yuno2.png": {
+			"frame": {
+				"x": 587,
+				"y": 1,
+				"w": 584,
+				"h": 712
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 584,
+				"h": 712
+			},
+			"sourceSize": {
+				"w": 584,
+				"h": 712
+			}
+		},
+		"yuno3.png": {
+			"frame": {
+				"x": 1173,
+				"y": 1,
+				"w": 584,
+				"h": 712
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 584,
+				"h": 712
+			},
+			"sourceSize": {
+				"w": 584,
+				"h": 712
+			}
+		},
+		"yuno4.png": {
+			"frame": {
+				"x": 1,
+				"y": 715,
+				"w": 584,
+				"h": 712
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 584,
+				"h": 712
+			},
+			"sourceSize": {
+				"w": 584,
+				"h": 712
+			}
+		},
+		"yuno5.png": {
+			"frame": {
+				"x": 587,
+				"y": 715,
+				"w": 584,
+				"h": 712
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 584,
+				"h": 712
+			},
+			"sourceSize": {
+				"w": 584,
+				"h": 712
+			}
+		},
+		"yuno6.png": {
+			"frame": {
+				"x": 1173,
+				"y": 715,
+				"w": 584,
+				"h": 712
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 584,
+				"h": 712
+			},
+			"sourceSize": {
+				"w": 584,
+				"h": 712
+			}
+		},
+		"yuno7.png": {
+			"frame": {
+				"x": 1759,
+				"y": 1,
+				"w": 584,
+				"h": 712
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 584,
+				"h": 712
+			},
+			"sourceSize": {
+				"w": 584,
+				"h": 712
+			}
+		},
+		"yuno8.png": {
+			"frame": {
+				"x": 1759,
+				"y": 715,
+				"w": 584,
+				"h": 712
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 584,
+				"h": 712
+			},
+			"sourceSize": {
+				"w": 584,
+				"h": 712
+			}
+		}
+	},
+	"meta": {
+		"app": "http://www.codeandweb.com/texturepacker",
+		"version": "1.0",
+		"image": "spritesheet.png",
+		"format": "RGBA8888",
+		"size": {
+			"w": 2344,
+			"h": 1428
+		},
+		"scale": "1"
+	}
+}

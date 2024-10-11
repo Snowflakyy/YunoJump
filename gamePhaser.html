@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
+    
+    <script>
+        class MainScene extends Phaser.Scene{
+            constructor(){
+
+                super('MainScene')
+                this.keys = {}
+                this.speed = 2;
+                this.gravity = 0.5
+                this.yunoSheet = {}
+                this.ground=null;
+                this.gameOver = false;
+                this.score = 0;
+
+            }
+            preload(){
+                this.load.image('night','images/night.png')
+                this.load.atlas('yuno', 'images/spritesheet.png', 'images/spritesheet.json')
+            }
+            create() {
+        this.createYunoSheet();
+        this.createPlayer();
+        this.createGround();
+        this.createBackGround()        
+
+        this.input.keyboard.on('keydown', this.keysDown, this);
+        this.input.keyboard.on('keyup', this.keysUp, this);
+
+        this.physics.add.collider(this.player, this.ground)
+        //code pls
+    }
+    createBackGround(){
+        let background = this.add.tileSprite(0,0,600,800)
+    }
+    createGround(){
+        this.ground = this.physics.add.staticGroup()
+        this.ground.create(400, 580, 'ground').setScale(2).refreshBody()
+    }
+    
+
+    createYunoSheet() {
+        this.yunoSheet['normal'] = this.anims.create({
+            key: 'normal',
+            frames: this.anims.generateFrameNames('yuno', { prefix: 'yuno', start: 1, end: 4, zeroPad: 0,suffix:'.png' }),
+            frameRate: 3,
+            repeat: -1
+        });
+
+        this.yunoSheet['jump'] = this.anims.create({
+            key: 'jump',
+            frames: this.anims.generateFrameNames('yuno', { prefix: 'yuno', start: 5, end: 8, zeroPad: 0,suffix:'.png' }),
+            frameRate: 3,
+            repeat: -1
+        });
+    }
+    //createGround()
+    createPlayer() {
+        this.player = this.physics.add.sprite(400, 450, 'yuno');
+        this.player.setScale(0.5);
+        this.player.setBounce(0.2)
+        this.player.setCollideWorldBounds(true);
+        this.player.play('normal');
+    }
+    keysDown(event){
+        this.keys[event.keyCode] = true;
+    }
+    keysUp(event){
+        this.keys[event.keyCode] = false;
+    }
+
+    update(){
+        if(this.keys['87'] && this.player.body.touching.down){
+            this.player.setVelocityY(-330)
+            this.player.play('jump',true)
+            
+    } else if (this.player.body.touching.down) {
+        this.player.play('normal', true);
+    }
+    const keysDiv = document.querySelector("#keys");
+        if (keysDiv) {
+            keysDiv.innerHTML = JSON.stringify(this.keys);
+        }
+}
+        }
+        const config = {
+    type: Phaser.AUTO,
+    width: 800,
+    height: 600,
+    physics: {
+        default: "arcade",
+        arcade: {
+            gravity: { y: 500 },
+            debug: true,
+            enableBody:true,
+        },
+    },
+    scene:MainScene
+};
+
+new Phaser.Game(config);
+
+    </script>
+    <div class="container">
+        <div id="keys"></div>
+     </div>
+</body>
+
+</html>
