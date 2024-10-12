@@ -12,13 +12,13 @@
     <script>
         let config = {
         type:Phaser.AUTO,
-        width:800,
+        width:1400,
         height:650,
         physics:{
             default:"arcade",
             arcade:{
                 gravity:{y:500},
-                debug:true,
+                debug:false,
             }
         },
         scene:{
@@ -66,18 +66,20 @@ let game = new Phaser.Game(config);
     base = this.physics.add.staticImage(game.config.width / 2, game.config.height - baseHeight / 2, "base")
         .setImmovable(true)
         .setDisplaySize(game.config.width, baseHeight);
-    
-    // Create a separate tileSprite for visual scrolling
+        base.setSize(game.config.width, baseHeight); 
+        base.setDisplaySize(game.config.width, baseHeight); 
+   
     baseScroll = this.add.tileSprite(game.config.width / 2, game.config.height - baseHeight / 2, game.config.width, baseHeight, "base")
         .setScrollFactor(0);
 
 
 
-    player = this.physics.add.sprite(game.config.width / 4, game.config.height / 2, 'yuno');
-    player.setScale(0.35);
-    player.setBounce(0.2);
+    player = this.physics.add.sprite(game.config.width / 10, game.config.height *0.75, 'yuno');
+    player.setScale(0.30);
     player.setCollideWorldBounds(true);
     player.setDepth(1);
+    player.setSize(player.width*0.75,player.height*0.75,true).setOffset(80,175)
+
     player.body.allowGravity = false;
 
     yunoSheet['normal'] = this.anims.create({
@@ -111,7 +113,7 @@ let game = new Phaser.Game(config);
 
         if (!isRefresh && !isGameOver && player.body.touching.down) {
             console.log("Fly");
-            player.setVelocityY(-350);
+            player.setVelocityY(-500);
             player.play('jump');
         }
         isRefresh = false;
@@ -120,6 +122,7 @@ let game = new Phaser.Game(config);
     this.physics.add.collider(player, base,function(){
         if (player.body.touching.down && player.anims.currentAnim && player.anims.currentAnim.key === 'jump') {
             player.play('normal');
+       
         }
     });
 
@@ -131,17 +134,14 @@ let game = new Phaser.Game(config);
         if (!gameStart) return;
 
 if (!isGameOver) {
-    // Move the base visual (tileSprite)
+   
     baseScroll.tilePositionX +=( Math.abs(speed) * (delta / 5000))/5;
 
-    // Move the background (optional, for parallax effect)
-    background.tilePositionX += (Math.abs(speed) * 0.5 * (delta / 5000))/5;
+ 
+    background.tilePositionX +=( Math.abs(speed) * (delta / 5000))/5;
 }
 
-// if (player.body.touching.down && player.anims.currentAnim && player.anims.currentAnim.key === 'jump') {
-//             player.play('normal');
-//         }
-// Check if player is in the air
+
 if (!player.body.touching.down && !player.anims.currentAnim ) {
     player.play('jump');
 }
@@ -151,9 +151,11 @@ if(player.body.touching.down && !player.anims.currentAnim )
 
     let scoreIncremented = false;
     this.lowerPillars.children.entries.forEach((obstacle) => {
-            obstacle.x += speed * (delta / 1000);
+            obstacle.x += speed * (delta / 10000);
+            console.log("Speed is: ",speed * (delta / 10000))
+            
             if(!obstacle) return;
-            if(!obstacle.hasPassed && obstacle.x+obstacle.width<player.x){
+            if(!obstacle.hasPassed && obstacle.x+obstacle.width<player.x && !isGameOver){
                 obstacle.hasPassed = true;
                 if(!scoreIncremented){
                     score++;
@@ -164,30 +166,43 @@ if(player.body.touching.down && !player.anims.currentAnim )
             }
             // Remove obstacle if it's off screen
             if (obstacle.x < -obstacle.width) {
-                obstacles.remove(obstacle, true, true);
+                this.lowerPillars.remove(obstacle, true, true);
             }
 
         });
   scoreIncremented = false;
-  if(this.pillarSpawnTime<this.time.now && !isGameOver) {
+  if(this.pillarSpawnTime<this.time.now && !isGameOver ) {
     this.spawnObstacle();
   }
         }
         Phaser.Scene.prototype.spawnObstacle =function(){
-            console.log("mAZNA")
+            
     const obstacleHeight = this.textures.get('pillar').getSourceImage().height;
-    const minY = baseHeight;
-    const maxY = game.config.height - baseHeight - obstacleHeight;
-    const randomY = Phaser.Math.Between(minY, maxY);
+    const obstacleWidth = this.textures.get('pillar').getSourceImage().width;
 
-    const obstacle = this.lowerPillars.create(game.config.width, randomY, 'pillar');
+    const obstacleY = game.config.height - baseHeight - (obstacleHeight / 10);
+
+    const obstacle = this.lowerPillars.create(game.config.width, obstacleY, 'pillar');
+    obstacle.setScale(0.25)
+    const hitboxWidth = obstacleWidth*0.75  
+    const hitboxHeight = obstacleHeight * 0.5
+    obstacle.setSize(hitboxWidth, hitboxHeight).setOffset(100,10)
+    const offsetX = 90; 
+    const offsetY = obstacleHeight * 0.4  
+    
+    obstacle.setOffset(offsetX, offsetY); 
     obstacle.setImmovable(true);
-    obstacle.body.allowGravity = false;
-    this.pillarSpawnTime = this.time.now+spawnTime;
+  
+    obstacle.body.allowGravity = false; 
+
+
+    this.pillarSpawnTime = (this.time.now+spawnTime+ 6000);
+    
 }
 function gameOver() {
     isGameOver = true;
     player.setTint(0xff0000);
+    player.anims.stop()
     this.lowerPillars.setVelocityX(0);
     this.physics.pause();
 
@@ -196,15 +211,12 @@ function gameOver() {
         fill: '#fff' 
     }).setOrigin(0.5);
 
-    this.add.text(game.config.width / 2, game.config.height / 2 + 60, 'Click to Restart', { 
+    this.add.text(game.config.width / 2, game.config.height / 2 + 60, 'Press F5 to Restart', { 
         fontSize: '22px', 
         fill: '#fff' 
     }).setOrigin(0.5);
 
-    this.input.on('pointerdown', () => {
-        isGameOver = false;
-        this.scene.restart();
-    });
+ 
 }
 
     </script>
